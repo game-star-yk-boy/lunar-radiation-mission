@@ -1,0 +1,109 @@
+:root {
+  color-scheme: dark;
+  --ink: #eaf7ff;
+  --muted: #8ba2b2;
+  --cyan: #50e6ff;
+  --amber: #ffbf4b;
+  --line: rgba(142, 195, 220, .18);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #02080d;
+  font-family: "Segoe UI", Inter, system-ui, sans-serif;
+  color: var(--ink);
+}
+
+body {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(34, 110, 148, .15), transparent 33%),
+    linear-gradient(145deg, #03090e, #07131e 52%, #02070b);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.game-shell {
+  width: min(100vw, 1500px);
+  display: grid;
+  grid-template-rows: 42px minmax(0, 1fr) 34px;
+  border: 1px solid var(--line);
+  background: #02080d;
+  box-shadow: 0 35px 100px rgba(0, 0, 0, .65);
+}
+
+.topline, footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  color: var(--muted);
+  font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .16em;
+  background: #071019;
+}
+
+.topline { border-bottom: 1px solid var(--line); }
+footer { border-top: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; color: #cfeaff; }
+.brand-mark { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--cyan); border-radius: 50%; color: var(--cyan); }
+.engine { color: var(--cyan); }
+.science-note { color: #617789; }
+
+#game-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  max-height: calc(100vh - 76px);
+  overflow: hidden;
+  background: #02070c;
+}
+
+#game-container canvas { display: block; width: 100% !important; height: 100% !important; }
+
+#loading, #load-error {
+  position: absolute;
+  inset: 42px 0 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--muted);
+  background: #02080d;
+  font-size: 13px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+#load-error { flex-direction: column; color: #ff9b82; z-index: 20; }
+#loading[hidden],
+#load-error[hidden] { display: none; }
+.loading-orbit { width: 24px; height: 24px; border: 1px solid #1d4c60; border-top-color: var(--cyan); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 700px) {
+  .topline { padding: 0 10px; }
+  .brand { font-size: 8px; letter-spacing: .1em; }
+  .engine, .science-note { display: none; }
+  footer { padding: 0 10px; }
+}
+
+@media (max-height: 600px) {
+  .game-shell { grid-template-rows: 30px minmax(0,1fr) 25px; }
+  #loading, #load-error { inset: 30px 0 25px; }
+  .topline, footer { font-size: 8px; }
+}
