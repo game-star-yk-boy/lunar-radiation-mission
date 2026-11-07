@@ -241,6 +241,7 @@
       this.keys = this.input.keyboard.addKeys('W,A,S,D,SPACE');
       this.buildHUD();
       this.buildTouchControls();
+      this.buildRadiationTiles();
 
       this.task('EVA CHECK', 'Exit the lander and assess the surface.');
       this.time.delayedCall(550, () => this.exitLander());
@@ -338,6 +339,29 @@
       makePad(137, '›', 'touchRight');
     }
 
+    buildRadiationTiles() {
+      this.radiationTiles = (window.LunarRadiationTiles || []).map((tile) => {
+        const marker = this.add.container(tile.x, 535).setDepth(7);
+        const color = tile.color || 0x50e6ff;
+        const glow = this.add.circle(0, 0, 29, color, .17).setStrokeStyle(2, color, .8);
+        const symbol = this.add.text(0, -2, tile.symbol || 'R', { ...uiText(23), fontStyle: 'bold' }).setOrigin(.5);
+        const label = this.add.text(0, 43, tile.label, monoText(10, '#eaf7ff')).setOrigin(.5);
+        marker.add([glow, symbol, label]);
+        return { ...tile, marker, collected: false };
+      });
+    }
+
+    collectRadiationTiles() {
+      if (this.state !== 'explore') return;
+      this.radiationTiles.forEach((tile) => {
+        if (tile.collected || Math.abs(this.astronaut.x - tile.x) > 45) return;
+        tile.collected = true;
+        tile.marker.setAlpha(.35);
+        const message = tile.onEnter(this);
+        this.task(tile.label, message);
+      });
+    }
+
     task(tag, text) {
       this.taskTag.setText(tag);
       this.taskText.setText(text);
@@ -358,6 +382,7 @@
       if (!this.astronaut || !this.astronaut.body) return;
 
       if (this.state === 'explore') this.playerMovement(delta);
+      this.collectRadiationTiles();
       if (this.autoMode) this.autoSequence(delta);
 
       if (this.state === 'decision' && this.decisionTime > 0) {
@@ -402,13 +427,14 @@
 
     updateRadiation(delta) {
       const sheltered = Math.abs(this.astronaut.x - 250) < 165 && this.state === 'explore';
-      const rate = sheltered ? RECOVERY_RATE : -DRAIN_RATE;
+      const surfaceDrain = DRAIN_RATE * (this.exposureMultiplier || 1);
+      const rate = sheltered ? RECOVERY_RATE : -surfaceDrain;
       this.resilience = Phaser.Math.Clamp(this.resilience + rate * (delta / 1000), 0, MAX_RESILIENCE);
       const ratio = this.resilience / MAX_RESILIENCE;
       this.healthFill.width = 278 * ratio;
       this.healthFill.setFillStyle(ratio > .55 ? COLORS.cyan : ratio > .25 ? COLORS.amber : COLORS.red);
       this.healthValue.setText(`${Math.ceil(this.resilience)}`);
-      this.rateText.setText(sheltered ? 'LANDER SHIELDING  +10 mSv/s' : 'SURFACE EXPOSURE  −10 mSv/s');
+      this.rateText.setText(sheltered ? 'LANDER SHIELDING  +10 mSv/s' : `SURFACE EXPOSURE  −${surfaceDrain.toFixed(0)} mSv/s`);
       this.rateText.setColor(sheltered ? '#69e5ff' : '#ff9c87');
       if (this.resilience <= 0 && !['ended', 'failed'].includes(this.state)) this.endMission(false, 'SUIT LIMIT EXCEEDED', 'Radiation resilience reached zero before shelter.');
     }
@@ -460,6 +486,7 @@
       this.decisionPointerHandler = null;
       this.decisionTimerText = null;
       this.decisionTime = 0;
+      this.flareTime = 10 + (this.flareBonus || 0);
       this.buildCountdown();
     }
 
@@ -503,7 +530,7 @@
       this.dismissAlarm();
       this.state = 'sample';
       this.autoMode = 'pickup';
-      this.pickupDelay = 2350;
+      this.pickupDelay = this.samplePickupDelay || 2350;
       this.task('HIGH-RISK RETURN', 'Securing sample… evacuation speed reduced.');
       this.astronaut.body.setVelocityX(0);
       this.tweens.add({ targets: this.rock, y: this.rock.y - 35, x: this.astronaut.x + 22, scale: .45, duration: 800, ease: 'Back.In' });
@@ -520,7 +547,7 @@
           this.task('HIGH-RISK RETURN', 'Sample secured. Reach shelter before impact.');
         }
       } else {
-        const speed = this.autoMode === 'escape' ? 510 : 125;
+        const speed = this.autoMode === 'escape' ? 510 : (this.sampleReturnSpeed || 125);
         this.astronaut.body.setVelocityX(-speed);
         this.astronaut.setScale(-.9, .9);
         this.walkTime += delta * .02;
@@ -531,6 +558,10 @@
         this.autoMode = null;
         this.astronaut.body.setVelocityX(0);
         this.endMission(true, 'MISSION PARTIALLY SUCCEEDED', 'Astronaut safe. The sample was lost, but the crew survived.');
+      } else if (this.autoMode === 'sample' && this.astronaut.x < 405) {
+        this.autoMode = null;
+        this.astronaut.body.setVelocityX(0);
+        this.endMission(true, 'SAMPLE RETURNED SAFELY', 'The crew reached shielding before the solar flare impact.');
       } else if (this.flareTime <= 0 && this.autoMode) {
         this.autoMode = null;
         this.astronaut.body.setVelocityX(0);
