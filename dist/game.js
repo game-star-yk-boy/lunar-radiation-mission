@@ -104,10 +104,11 @@
     const bg = scene.add.rectangle(0, 0, w, h, fill, .95).setStrokeStyle(1, 0xffffff, .22);
     const t = scene.add.text(0, 0, label, { ...monoText(14, '#f6fbff'), fontStyle: 'bold' }).setOrigin(.5);
     c.add([bg, t]);
-    c.setSize(w, h).setInteractive({ useHandCursor: true });
-    c.on('pointerover', () => { bg.setFillStyle(fill, 1); c.setScale(1.025); });
-    c.on('pointerout', () => { bg.setFillStyle(fill, .95); c.setScale(1); });
-    c.on('pointerdown', callback);
+    c.setSize(w, h);
+    bg.setInteractive({ useHandCursor: true });
+    bg.on('pointerover', () => { bg.setFillStyle(fill, 1); c.setScale(1.025); });
+    bg.on('pointerout', () => { bg.setFillStyle(fill, .95); c.setScale(1); });
+    bg.on('pointerdown', callback);
     return c;
   }
 
@@ -213,6 +214,11 @@
       this.choiceLocked = false;
       this.autoMode = null;
       this.flareTime = 10;
+      this.decisionTime = 0;
+      this.decisionResolved = false;
+      this.decisionButtons = [];
+      this.decisionKeys = null;
+      this.decisionPointerHandler = null;
 
       this.physics.world.setBounds(0, 0, WORLD_WIDTH, HEIGHT);
       this.cameras.main.setBounds(0, 0, WORLD_WIDTH, HEIGHT);
@@ -354,6 +360,18 @@
       if (this.state === 'explore') this.playerMovement(delta);
       if (this.autoMode) this.autoSequence(delta);
 
+      if (this.state === 'decision' && this.decisionTime > 0) {
+        const choseLeave = this.decisionKeys && Phaser.Input.Keyboard.JustDown(this.decisionKeys.one);
+        const choseSample = this.decisionKeys && Phaser.Input.Keyboard.JustDown(this.decisionKeys.two);
+        if (choseLeave) this.chooseEscape();
+        else if (choseSample) this.chooseSample();
+        else {
+          this.decisionTime = Math.max(0, this.decisionTime - delta / 1000);
+          if (this.decisionTimerText) this.decisionTimerText.setText(this.decisionTime.toFixed(1));
+          if (this.decisionTime <= 0) this.failMissedDecision();
+        }
+      }
+
       if (['explore', 'escape', 'sample'].includes(this.state)) this.updateRadiation(delta);
 
       if (this.state === 'explore' && !this.choiceLocked && this.astronaut.x > 1640) {
@@ -396,25 +414,69 @@
     }
 
     showFlareDecision() {
+      this.decisionTime = 2;
+      this.decisionResolved = false;
+      this.decisionKeys = this.input.keyboard.addKeys({ one: 'ONE', two: 'TWO' });
       this.alarm = this.add.container(640, 0).setScrollFactor(0).setDepth(80);
       const shade = this.add.rectangle(0, 360, 1280, 720, 0x010407, .72);
       const panel = this.add.rectangle(0, 360, 780, 430, 0x100d0d, .98).setStrokeStyle(2, COLORS.red, .75);
       const warning = this.add.text(0, 193, '⚠  SOLAR FLARE DETECTED', { ...monoText(16, '#ff7869'), fontStyle: 'bold' }).setOrigin(.5);
-      const title = this.add.text(0, 237, 'PARTICLE FRONT ARRIVES IN 10 SECONDS', { ...uiText(29), fontStyle: '800' }).setOrigin(.5);
-      const body = this.add.text(0, 286, 'The sample is scientifically valuable—but carrying it will slow your return.\nChoose now. The Moon will not wait.', { ...uiText(16, '#aebdc6'), align: 'center', lineSpacing: 7 }).setOrigin(.5);
+      const title = this.add.text(0, 230, 'CHOOSE BEFORE TIME EXPIRES', { ...uiText(29), fontStyle: '800' }).setOrigin(.5);
+      this.decisionTimerText = this.add.text(0, 272, '2.0', { ...monoText(42, '#ff6d5e'), fontStyle: 'bold' }).setOrigin(.5);
+      const body = this.add.text(0, 319, 'No decision means automatic mission failure.', { ...uiText(15, '#aebdc6'), align: 'center' }).setOrigin(.5);
       const divider = this.add.rectangle(0, 333, 660, 1, 0x77403a, .6);
-      const leave = button(this, -175, 395, 300, 78, 'LEAVE SAMPLE\nSPRINT TO SHELTER', 0x12667b, () => this.chooseEscape());
-      const take = button(this, 175, 395, 300, 78, 'SECURE SAMPLE\nRISK THE RETURN', 0x6e332e, () => this.chooseSample());
-      const note = this.add.text(0, 465, 'Decision locks immediately', monoText(10, '#7c8b94')).setOrigin(.5);
-      this.alarm.add([shade, panel, warning, title, body, divider, leave, take, note]);
+      const note = this.add.text(0, 468, 'CLICK A CHOICE OR PRESS 1 / 2', monoText(11, '#9aaab3')).setOrigin(.5);
+      this.alarm.add([shade, panel, warning, title, this.decisionTimerText, body, divider, note]);
       this.alarm.setY(-35).setAlpha(0);
       this.tweens.add({ targets: this.alarm, y: 0, alpha: 1, duration: 350, ease: 'Back.Out' });
+
+      // Keep the choices at scene level. Phaser 4 input hit areas on nested,
+      // re-parented containers can become misaligned after camera transforms.
+      const leave = button(this, 465, 395, 300, 78, '1  LEAVE SAMPLE\nSPRINT TO SHELTER', 0x12667b, () => this.chooseEscape())
+        .setScrollFactor(0).setDepth(82).setAlpha(0);
+      const take = button(this, 815, 395, 300, 78, '2  SECURE SAMPLE\nRISK THE RETURN', 0x6e332e, () => this.chooseSample())
+        .setScrollFactor(0).setDepth(82).setAlpha(0);
+      this.decisionButtons = [leave, take];
+      this.tweens.add({ targets: this.decisionButtons, y: { from: 360, to: 395 }, alpha: 1, duration: 300, ease: 'Back.Out' });
+
+      // Scene-level hit testing keeps the urgent choices reliable across
+      // browser scaling, touch input, and Phaser container transforms.
+      this.decisionPointerHandler = (pointer) => {
+        if (this.state !== 'decision' || this.decisionResolved) return;
+        if (pointer.y < 340 || pointer.y > 450) return;
+        if (pointer.x >= 295 && pointer.x <= 635) this.chooseEscape();
+        else if (pointer.x >= 645 && pointer.x <= 985) this.chooseSample();
+      };
+      this.input.on('pointerdown', this.decisionPointerHandler);
       this.cameras.main.flash(250, 255, 70, 45, false);
     }
 
     dismissAlarm() {
       if (this.alarm) this.alarm.destroy(true);
+      this.alarm = null;
+      this.decisionButtons.forEach((choice) => choice.destroy(true));
+      this.decisionButtons = [];
+      if (this.decisionPointerHandler) this.input.off('pointerdown', this.decisionPointerHandler);
+      this.decisionPointerHandler = null;
+      this.decisionTimerText = null;
+      this.decisionTime = 0;
       this.buildCountdown();
+    }
+
+    failMissedDecision() {
+      if (this.state !== 'decision' || this.decisionResolved) return;
+      this.decisionResolved = true;
+      if (this.alarm) this.alarm.destroy(true);
+      this.alarm = null;
+      this.decisionButtons.forEach((choice) => choice.destroy(true));
+      this.decisionButtons = [];
+      if (this.decisionPointerHandler) this.input.off('pointerdown', this.decisionPointerHandler);
+      this.decisionPointerHandler = null;
+      this.decisionTimerText = null;
+      this.decisionTime = 0;
+      this.astronaut.body.setVelocityX(0);
+      this.task('DECISION MISSED', 'No response received. Solar particle impact is unavoidable.');
+      this.flareImpact('No decision was made within 2 seconds. The solar flare overwhelmed the suit.');
     }
 
     buildCountdown() {
@@ -426,6 +488,8 @@
     }
 
     chooseEscape() {
+      if (this.state !== 'decision' || this.decisionResolved) return;
+      this.decisionResolved = true;
       this.dismissAlarm();
       this.state = 'escape';
       this.autoMode = 'escape';
@@ -434,6 +498,8 @@
     }
 
     chooseSample() {
+      if (this.state !== 'decision' || this.decisionResolved) return;
+      this.decisionResolved = true;
       this.dismissAlarm();
       this.state = 'sample';
       this.autoMode = 'pickup';
@@ -472,7 +538,7 @@
       }
     }
 
-    flareImpact() {
+    flareImpact(failureDescription = 'The sample delayed evacuation. The solar flare overwhelmed the suit.') {
       this.state = 'failed';
       this.cameras.main.shake(950, .02);
       this.cameras.main.flash(500, 255, 80, 32, false);
@@ -484,7 +550,7 @@
       this.healthValue.setText(`${Math.ceil(this.resilience)}`);
       this.rateText.setText('CRITICAL SOLAR PARTICLE EXPOSURE');
       this.rateText.setColor('#ff5b4a');
-      this.time.delayedCall(1200, () => this.endMission(false, 'MISSION FAILED', 'The sample delayed evacuation. The solar flare overwhelmed the suit.'));
+      this.time.delayedCall(1200, () => this.endMission(false, 'MISSION FAILED', failureDescription));
     }
 
     endMission(success, title, description) {
@@ -516,7 +582,7 @@
       return;
     }
 
-    new Phaser.Game({
+    window.lunarGame = new Phaser.Game({
       type: Phaser.AUTO,
       parent: 'game-container',
       width: WIDTH,
