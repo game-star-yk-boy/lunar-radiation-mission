@@ -8,7 +8,7 @@
   const GROUND_Y = 584;
   const WORLD_WIDTH = 2700;
   const MAX_RESILIENCE = 600;
-  const DRAIN_RATE = 5;
+  const DRAIN_RATE = 10;
   const RECOVERY_RATE = 10;
 
   const COLORS = {
@@ -146,7 +146,7 @@
 
       this.add.text(1184, 78, '600', { ...monoText(54, '#ffbf4b'), fontStyle: 'bold' }).setOrigin(1, 0);
       this.add.text(1184, 140, 'mSv SUIT RESILIENCE', monoText(11, '#8ba2b2')).setOrigin(1, 0);
-      this.add.text(1184, 175, '−5 mSv / SEC', monoText(11, '#ff816f')).setOrigin(1, 0);
+      this.add.text(1184, 175, '−10 mSv / SEC', monoText(11, '#ff816f')).setOrigin(1, 0);
     }
   }
 
@@ -310,7 +310,7 @@
       this.healthFill = this.add.rectangle(46, 71, 278, 15, COLORS.cyan, 1).setOrigin(0, .5);
       this.healthValue = this.add.text(356, 61, '600', { ...monoText(18, '#eaf7ff'), fontStyle: 'bold' }).setOrigin(1, 0);
       const unit = this.add.text(356, 82, 'mSv', monoText(10, '#8098a8')).setOrigin(1, 0);
-      this.rateText = this.add.text(46, 96, 'SURFACE EXPOSURE  −5 mSv/s', monoText(11, '#ff9c87'));
+      this.rateText = this.add.text(46, 96, 'SURFACE EXPOSURE  −10 mSv/s', monoText(11, '#ff9c87'));
       this.hud.add([panel, title, this.healthBack, this.healthFill, this.healthValue, unit, this.rateText]);
 
       this.taskPanel = this.add.container(640, 34).setScrollFactor(0).setDepth(31);
@@ -408,13 +408,13 @@
       this.healthFill.width = 278 * ratio;
       this.healthFill.setFillStyle(ratio > .55 ? COLORS.cyan : ratio > .25 ? COLORS.amber : COLORS.red);
       this.healthValue.setText(`${Math.ceil(this.resilience)}`);
-      this.rateText.setText(sheltered ? 'LANDER SHIELDING  +10 mSv/s' : 'SURFACE EXPOSURE  −5 mSv/s');
+      this.rateText.setText(sheltered ? 'LANDER SHIELDING  +10 mSv/s' : 'SURFACE EXPOSURE  −10 mSv/s');
       this.rateText.setColor(sheltered ? '#69e5ff' : '#ff9c87');
       if (this.resilience <= 0 && !['ended', 'failed'].includes(this.state)) this.endMission(false, 'SUIT LIMIT EXCEEDED', 'Radiation resilience reached zero before shelter.');
     }
 
     showFlareDecision() {
-      this.decisionTime = 2;
+      this.decisionTime = 5;
       this.decisionResolved = false;
       this.decisionKeys = this.input.keyboard.addKeys({ one: 'ONE', two: 'TWO' });
       this.alarm = this.add.container(640, 0).setScrollFactor(0).setDepth(80);
@@ -422,7 +422,7 @@
       const panel = this.add.rectangle(0, 360, 780, 430, 0x100d0d, .98).setStrokeStyle(2, COLORS.red, .75);
       const warning = this.add.text(0, 193, '⚠  SOLAR FLARE DETECTED', { ...monoText(16, '#ff7869'), fontStyle: 'bold' }).setOrigin(.5);
       const title = this.add.text(0, 230, 'CHOOSE BEFORE TIME EXPIRES', { ...uiText(29), fontStyle: '800' }).setOrigin(.5);
-      this.decisionTimerText = this.add.text(0, 272, '2.0', { ...monoText(42, '#ff6d5e'), fontStyle: 'bold' }).setOrigin(.5);
+      this.decisionTimerText = this.add.text(0, 272, '5.0', { ...monoText(42, '#ff6d5e'), fontStyle: 'bold' }).setOrigin(.5);
       const body = this.add.text(0, 319, 'No decision means automatic mission failure.', { ...uiText(15, '#aebdc6'), align: 'center' }).setOrigin(.5);
       const divider = this.add.rectangle(0, 333, 660, 1, 0x77403a, .6);
       const note = this.add.text(0, 468, 'CLICK A CHOICE OR PRESS 1 / 2', monoText(11, '#9aaab3')).setOrigin(.5);
@@ -476,7 +476,7 @@
       this.decisionTime = 0;
       this.astronaut.body.setVelocityX(0);
       this.task('DECISION MISSED', 'No response received. Solar particle impact is unavoidable.');
-      this.flareImpact('No decision was made within 2 seconds. The solar flare overwhelmed the suit.');
+      this.flareImpact('No decision was made within 5 seconds. The solar flare overwhelmed the suit.');
     }
 
     buildCountdown() {
