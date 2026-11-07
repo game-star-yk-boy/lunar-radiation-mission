@@ -259,10 +259,10 @@
       ground.fillRect(0, GROUND_Y, WORLD_WIDTH, HEIGHT - GROUND_Y);
       ground.fillStyle(0xb9bdc0, 1);
       ground.fillPoints([
-        new Phaser.Geom.Point(0, 584), new Phaser.Geom.Point(260, 572), new Phaser.Geom.Point(510, 590),
-        new Phaser.Geom.Point(790, 566), new Phaser.Geom.Point(1110, 584), new Phaser.Geom.Point(1430, 562),
-        new Phaser.Geom.Point(1730, 582), new Phaser.Geom.Point(2030, 565), new Phaser.Geom.Point(2360, 587),
-        new Phaser.Geom.Point(2700, 572), new Phaser.Geom.Point(2700, 720), new Phaser.Geom.Point(0, 720),
+        { x: 0, y: 584 }, { x: 260, y: 572 }, { x: 510, y: 590 },
+        { x: 790, y: 566 }, { x: 1110, y: 584 }, { x: 1430, y: 562 },
+        { x: 1730, y: 582 }, { x: 2030, y: 565 }, { x: 2360, y: 587 },
+        { x: 2700, y: 572 }, { x: 2700, y: 720 }, { x: 0, y: 720 },
       ], true);
       ground.fillStyle(0x747d84, .58);
       [[510,620,90,24],[920,650,140,32],[1370,610,75,20],[2100,640,150,35],[2490,610,95,25]].forEach(([x,y,w,h]) => ground.fillEllipse(x,y,w,h));
