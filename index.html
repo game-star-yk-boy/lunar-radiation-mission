@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#07131e">
+  <meta name="description" content="A cinematic Phaser 4 lunar exploration game about radiation risk and scientific discovery.">
+  <link rel="icon" href="data:,">
+  <title>Lunar Radiation Mission</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="game-shell" aria-label="Lunar Radiation Mission game">
+    <header class="topline">
+      <div class="brand"><span class="brand-mark">L</span><span>LUNAR / RADIATION MISSION</span></div>
+      <div class="engine">PHASER 4.2.1</div>
+    </header>
+    <section id="game-container" aria-label="Interactive game canvas"></section>
+    <div id="loading" role="status">
+      <span class="loading-orbit"></span>
+      <span>Initializing lunar systems…</span>
+    </div>
+    <div id="load-error" hidden>
+      <strong>Mission systems could not start.</strong>
+      <span>Check your connection and reload the page.</span>
+    </div>
+    <footer>
+      <span>Move: ARROWS / WASD</span>
+      <span class="science-note">Gameplay values are accelerated for simulation.</span>
+      <span>MISSION 01</span>
+    </footer>
+  </main>
+  <script src="phaser.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
