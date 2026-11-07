@@ -1,31 +1,44 @@
-# Lunar Radiation Mission: four-person build activity (25 minutes)
+# Lunar Radiation Mission: learn Codex together
 
-## Goal
+## Activity goal
 
-Four people start from the same `Lunar-Radiation-Mission` repository and launch it with `Radiation1.py`. Each person adds one **radiation-themed game tile** in a separate file. Merge the four branches into `main` and play one combined game.
+In 25 minutes, four people will each use Codex to create one radiation-themed feature, add their own generated code to a separate branch, and combine all four features into one playable game.
 
-The Python file starts the local web server. The game itself is Phaser code in `game.js`. The starter already loads the four tile files and provides the `onEnter(scene)` hook, so no participant needs to edit the shared game code.
+Everyone starts from the same `Lunar-Radiation-Mission` repository and launches it with `Radiation1.py`. That Python file starts the local web server; Phaser game code lives in `game.js`. The starter includes four separate tile files and a shared tile hook. Each person should use Codex to develop their assigned feature, then copy Codex's code into only their assigned tile file.
 
-## Before the 25-minute session (facilitator)
+## Before the activity
 
-Make sure this starter version, including `Radiation1.py`, the `tiles` folder, and the tile hookup in `game.js` and `index.html`, is committed and pushed to `main` at `https://github.com/game-star-yk-boy/lunar-radiation-mission`. Give all four people write access to the repository. Each device needs Python 3, Git, a browser, and a code editor. Keep `phaser.min.js` in the repository; no package installation is needed.
+The facilitator should make sure this starter version is pushed to `main` at `https://github.com/game-star-yk-boy/lunar-radiation-mission` and give all four people write access. Each device needs Codex, Python 3, Git, a browser, and a code editor. Keep `phaser.min.js` in the repository; no package installation is needed.
 
-## Four objectives
+## Assign one objective to each person
 
-| Person | Branch | Only file to edit | Tile and visible effect |
+| Person | Branch | File to update | Objective |
 | --- | --- | --- | --- |
-| 1 | `tile/dosimeter` | `tiles/01_dosimeter.js` | Dosimeter at x=520: survey a safer route, reducing later surface drain by 20%. |
-| 2 | `tile/shielding` | `tiles/02_shielding.js` | Portable shielding at x=800: restore 50 points of the game's radiation resilience. |
-| 3 | `tile/forecast` | `tiles/03_forecast.js` | Solar forecast at x=1080: add 3 seconds to the flare return countdown. |
-| 4 | `tile/sample-tools` | `tiles/04_sample_tools.js` | Sample tools at x=1370: shorten pickup and speed up the sample return, making safe sample recovery possible. |
+| 1 | `tile/dosimeter` | `tiles/01_dosimeter.js` | Create a dosimeter tile at x=520. When the astronaut reaches it, show a radiation survey message and reduce the ongoing surface drain by 20%. The HUD should show the adjusted rate. |
+| 2 | `tile/shielding` | `tiles/02_shielding.js` | Create a portable shielding tile at x=800. When collected, restore up to 50 points of game resilience, never exceeding the 600 point maximum, and show a confirmation message. |
+| 3 | `tile/forecast` | `tiles/03_forecast.js` | Create a solar forecast tile at x=1080. Collecting it before the flare warning should add 3 seconds to the flare return countdown. Show a warning received message. |
+| 4 | `tile/sample-tools` | `tiles/04_sample_tools.js` | Create a sample tools tile at x=1370. It should shorten sample pickup to about 1.2 seconds and make the return fast enough to reach shelter before the flare. |
 
 These are gameplay values, not a real radiation exposure model. The in-game resilience meter is a game resource.
 
-## Minute-by-minute tutorial
+## How each person uses Codex
 
-### 0:00–3:00 — Everyone opens the same starter
+Each person opens their own clone of the repository in Codex. Read the assigned objective and inspect the existing tile hookup before writing a prompt. Then write a prompt in your own words. Include enough context for Codex to understand:
 
-On each device, clone the repository and run the starting Python file:
+- what the game is and where the feature belongs;
+- your assigned objective and how a player should see it work;
+- that the feature must stay on the lunar radiation theme;
+- the one tile file you are responsible for;
+- any existing shared game code or files Codex must leave alone; and
+- what code and explanation you want Codex to return.
+
+Read Codex's response before using it. Check that it meets the objective, uses the existing tile registration hook, and does not require edits to another person's file. Ask Codex to revise anything that is unclear or incomplete. Copy the final code into your assigned file, save it, and try the feature in the browser. The objective belongs to the participant; Codex supplies coding help, and the participant reviews and tests the result.
+
+## 25-minute tutorial
+
+### 0:00–4:00 — Open and run the starter
+
+Each person clones the repository, opens that folder in Codex, and starts the game:
 
 ```powershell
 git clone https://github.com/game-star-yk-boy/lunar-radiation-mission.git
@@ -33,90 +46,29 @@ cd lunar-radiation-mission
 python Radiation1.py
 ```
 
-Open `http://127.0.0.1:8000` if it does not open automatically. Click **Begin Mission**, then **Skip Cinematic**. Check that the astronaut moves with arrow keys or A/D. Keep the server running while editing; reload the browser after saving a file. If `python` is unavailable on Windows, try `py Radiation1.py`.
+Open `http://127.0.0.1:8000` if it does not open automatically. Click **Begin Mission**, then **Skip Cinematic**. Check that the astronaut moves with arrow keys or A/D. If `python` is unavailable on Windows, try `py Radiation1.py`.
 
-### 3:00–5:00 — Split the work
+### 4:00–6:00 — Assign objectives and branches
 
-Each person creates their assigned branch in a **separate clone**:
+Each person uses a separate clone and creates the branch shown in the table. For example:
 
 ```powershell
 git switch -c tile/dosimeter
 ```
 
-Replace `tile/dosimeter` with the branch in the table. Open only your assigned file. The shared tile format is `label`, `x`, `symbol`, `color`, and `onEnter(scene)`. The game calls `onEnter` once when the astronaut walks into the tile; its returned sentence appears in the task panel.
+Open only your assigned tile file. The shared hook expects each file to register a tile with a position, label, symbol, color, and an `onEnter(scene)` behavior. The game displays the tile in the world and calls its behavior when the astronaut reaches it.
 
-### 5:00–15:00 — Build the four tiles in parallel
+### 6:00–8:00 — Write your own Codex prompt
 
-**Person 1 — Dosimeter.** Replace the contents of `tiles/01_dosimeter.js` with:
+Read **How each person uses Codex** and your assigned objective. Inspect `game.js` and one of the tile placeholders to understand how features connect. Write your own prompt to Codex; the facilitator should help participants improve their prompts by asking what context, constraints, or success criteria are missing, without writing the prompt for them.
 
-```javascript
-window.LunarRadiationTiles = window.LunarRadiationTiles || [];
-window.LunarRadiationTiles.push({
-  x: 520,
-  label: 'DOSIMETER SCAN',
-  symbol: 'D',
-  color: 0x50e6ff,
-  onEnter(scene) {
-    scene.exposureMultiplier = 0.8;
-    return 'Survey complete: safer route reduces surface drain by 20%.';
-  },
-});
-```
+### 8:00–15:00 — Generate, review, and add your code
 
-**Person 2 — Shielding.** Replace the contents of `tiles/02_shielding.js` with:
+Ask Codex to create your feature. Read its response, request revisions if needed, and copy the code into your assigned file. Save, reload the browser, walk to the tile, and check the visible effect. Keep the feature code in that one tile file; if Codex suggests editing shared files, explain the starter's tile hook and ask it for a version that fits your assigned file.
 
-```javascript
-window.LunarRadiationTiles = window.LunarRadiationTiles || [];
-window.LunarRadiationTiles.push({
-  x: 800,
-  label: 'SHIELDING CACHE',
-  symbol: 'S',
-  color: 0x80dca5,
-  onEnter(scene) {
-    scene.resilience = Phaser.Math.Clamp(scene.resilience + 50, 0, 600);
-    return 'Portable shielding collected: +50 game resilience.';
-  },
-});
-```
+### 15:00–18:00 — Commit and open pull requests
 
-**Person 3 — Solar forecast.** Replace the contents of `tiles/03_forecast.js` with:
-
-```javascript
-window.LunarRadiationTiles = window.LunarRadiationTiles || [];
-window.LunarRadiationTiles.push({
-  x: 1080,
-  label: 'SOLAR FORECAST',
-  symbol: 'F',
-  color: 0xffbf4b,
-  onEnter(scene) {
-    scene.flareBonus = 3;
-    return 'Solar warning received: +3 seconds for flare evacuation.';
-  },
-});
-```
-
-**Person 4 — Sample tools.** Replace the contents of `tiles/04_sample_tools.js` with:
-
-```javascript
-window.LunarRadiationTiles = window.LunarRadiationTiles || [];
-window.LunarRadiationTiles.push({
-  x: 1370,
-  label: 'SAMPLE TOOLS',
-  symbol: 'T',
-  color: 0xd6a9ff,
-  onEnter(scene) {
-    scene.samplePickupDelay = 1200;
-    scene.sampleReturnSpeed = 220;
-    return 'Sample tools ready: faster collection and return.';
-  },
-});
-```
-
-Each person saves, reloads the browser, walks right from the lander, and confirms their tile appears and changes the task message when touched. The other three tiles will remain absent in that person's branch until the merge.
-
-### 15:00–18:00 — Commit and share
-
-Each person checks that only their tile file changed, then commits and pushes their own branch:
+Each person checks that only their assigned tile file changed, then commits and pushes their branch. Example for Person 1:
 
 ```powershell
 git status --short
@@ -125,21 +77,21 @@ git commit -m "Add dosimeter radiation tile"
 git push -u origin tile/dosimeter
 ```
 
-Use your own filename, message, and branch from the table. On GitHub, open a pull request from your branch into `main`.
+Use your own file, commit message, and branch from the table. On GitHub, open a pull request from your branch into `main`.
 
-### 18:00–22:00 — Combine the four projects
+### 18:00–22:00 — Combine the four contributions
 
-Choose one person to integrate. On GitHub, merge the four pull requests into `main`, one at a time. Each branch edits a different tile file, so the changes should combine without a code conflict. If GitHub reports a conflict, check that no participant edited `game.js`, `index.html`, or another person's tile file. Resolve that extra edit before merging.
+Choose one person to integrate. Merge the four pull requests into `main`, one at a time. Each person works in a separate tile file. If GitHub reports a conflict, check whether someone edited `game.js`, `index.html`, or another person's tile file.
 
-All four people then update their local copy:
+Everyone updates their local copy:
 
 ```powershell
 git switch main
 git pull origin main
 ```
 
-### 22:00–25:00 — Play the combined game
+### 22:00–25:00 — Play and review the combined game
 
-Restart `python Radiation1.py` if needed and reload the browser. Skip the cinematic and walk right. Confirm **four tiles appear in order**: dosimeter, shielding, forecast, sample tools. Touch each one and check the task message. Continue to the crystal, choose **2 / Secure Sample**, and verify the astronaut reaches the lander before the extended flare countdown ends. Replay and choose **1 / Leave Sample** to confirm that route still finishes. The final result is one working game on `main` containing all four contributions.
+Restart `python Radiation1.py` if needed and reload the browser. Skip the cinematic and walk right. Confirm the four tiles appear in order and that each one shows its effect. The dosimeter should adjust the surface drain, shielding should restore resilience, and the forecast should extend the flare timer. Continue to the crystal, choose **2 / Secure Sample**, and check whether the sample tools make a safe return possible. Replay and choose **1 / Leave Sample** to check that route still works.
 
-If the sample route fails, check that the astronaut touched all four tiles before reaching the crystal and that the merged `tiles/04_sample_tools.js` contains both sample settings.
+If a feature is missing, check that its pull request was merged, the code is in the correct tile file, and the browser was reloaded. The combined result is one radiation-themed game on `main`, built from four participant-written Codex prompts and four reviewed code contributions.
