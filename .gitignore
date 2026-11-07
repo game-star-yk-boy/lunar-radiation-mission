@@ -1,1 +1,79 @@
+# Python bytecode and caches
+__pycache__/
+*.py[codz]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Python virtual environments and packaging output
+.venv/
+venv/
+env/
+ENV/
+build/
+develop-eggs/
+eggs/
+.eggs/
+wheels/
+*.egg-info/
+*.egg
+.Python
+.installed.cfg
+
+# Local environment variables and credentials
+.env
+.env.*
+!.env.example
+.envrc
 SECRET
+
+# JavaScript / Node tooling (the game has no committed dependency tree)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+*.pid
+*.seed
+*.pid.lock
+.npm/
+.nyc_output/
+coverage/
+*.lcov
+.eslintcache
+.stylelintcache
+.node_repl_history
+
+# Windows temporary files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS metadata
+.DS_Store
+
+# Visual Studio Code user state; keep shareable workspace settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!*.code-workspace
+*.vsix
+
+# Keep dist/ tracked: it contains this project's packaged game files.
+# Ignore only transient build caches and local reports above.
