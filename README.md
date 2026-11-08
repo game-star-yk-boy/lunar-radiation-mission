@@ -2,6 +2,8 @@
 
 A cinematic, educational 2D Moon mission built with Phaser 4.2.1.
 
+See [requirements.md](requirements.md) for the detailed functional and runtime specification.
+
 ## Run locally
 
 From the repository root:
