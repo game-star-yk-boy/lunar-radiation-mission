@@ -38,7 +38,7 @@ The central lesson is that crew safety takes priority over recovering a scientif
 - The lander area is visibly identified as a shield zone.
 - The astronaut is the player-controlled character during exploration. Movement should include a subtle walking motion and face the direction of travel.
 - A distance readout should communicate the astronaut’s distance from the lander.
-- An exploration task panel should show the current objective and brief messages when mission events or radiation tiles activate.
+- An exploration task panel should show the current objective and brief messages when mission events or radiation-related items activate.
 
 ## 6. Radiation resilience
 
@@ -51,15 +51,7 @@ The central lesson is that crew safety takes priority over recovering a scientif
 - If resilience reaches zero before the mission ends, the crew fails the mission from suit-limit exhaustion.
 - Radiation values and timing are gameplay abstractions and must be described as such in player-facing information.
 
-## 7. Radiation tile: dosimeter survey
-
-- Place a dosimeter survey pickup early along the surface route, near the lander.
-- Identify the marker with the label “DOSIMETER SURVEY,” the symbol “D,” and a cyan glow.
-- When the astronaut reaches the marker, activate it once, fade its appearance, and show a short survey-complete message in the task panel.
-- The survey reduces ongoing surface resilience drain by 20%, from 10 to 8 points per second.
-- Update the displayed exposure rate to reflect the reduction.
-
-## 8. Crystalline anomaly and solar-flare decision
+## 7. Crystalline anomaly and solar-flare decision
 
 - When the astronaut reaches the anomaly area, show a discovery message and pause forward movement.
 - After a brief warning transition, display a prominent solar-flare alert and start a five-second decision timer.
@@ -71,7 +63,7 @@ The central lesson is that crew safety takes priority over recovering a scientif
 - Permit only one decision to take effect. Ignore extra pointer or key input after a choice is resolved.
 - If no decision is made within five seconds, the flare overwhelms the suit and the mission fails.
 
-## 9. Return routes and outcomes
+## 8. Return routes and outcomes
 
 ### Leave the sample
 
@@ -93,32 +85,29 @@ The central lesson is that crew safety takes priority over recovering a scientif
 - The results screen distinguishes safe crew status from critical crew status, gives a headline and short explanation, displays final resilience, and reinforces the safety lesson.
 - The safety message must communicate that scientific value does not justify an unsafe return.
 
-## 10. Radiation tile interaction rules
+## 9. Radiation-related item interactions
 
-- A tile activates once when the astronaut comes within a short distance of its marker while exploring.
-- Each activated tile fades and updates the task panel with its name and result.
-- Tile effects may adjust resilience, surface drain, flare warning time, or sample recovery time, provided they remain clearly related to lunar radiation risk and crew safety.
-- Tile messages must be short and visible during play.
+- An item activates once when the astronaut comes within a short distance of its marker while exploring.
+- Each activated item fades and updates the task panel with its name and result.
+- Item effects may adjust resilience, surface drain, flare warning time, or sample recovery time, provided they remain clearly related to lunar radiation risk and crew safety.
+- Item messages must be short and visible during play.
 
-At the time this specification was written, the dosimeter survey is the only implemented tile. Other tile concepts are not part of the current playable game until implemented.
-
-## 11. Mission states and consistency
+## 10. Mission states and consistency
 
 - The mission progresses through entry, exploration, decision, return, and final-result phases.
 - Trigger the crystalline anomaly decision once per mission.
-- Activate each radiation tile at most once per mission.
+- Activate each radiation-related item at most once per mission.
 - Stop astronaut movement when presenting the flare decision, on impact, and on the results screen.
-- Replaying starts a clean mission with resilience reset to 600, the dosimeter available again, and no prior decision or flare timer carried over.
+- Replaying starts a clean mission with resilience reset to 600 and no prior decisions, collected items, or flare timer carried over.
 
-## 12. Game acceptance criteria
+## 11. Game acceptance criteria
 
 The game meets these requirements when a player can:
 
 1. Start the mission from the title and skip the journey sequence.
 2. Explore the lunar surface using either keyboard or touch controls.
 3. Read the resilience meter, exposure rate, current task, and distance from the lander.
-4. Collect the dosimeter once and see the exposure rate change from 10 to 8 points per second.
-5. Reach the crystalline anomaly and make either flare decision using a pointer or the specified number key.
-6. See a failure if the five-second decision window expires without a choice.
-7. Reach a clear outcome showing crew safety, sample recovery status, final resilience, and the mission’s safety lesson.
-8. Replay the mission with all mission state reset.
+4. Reach the crystalline anomaly and make either flare decision using a pointer or the specified number key.
+5. See a failure if the five-second decision window expires without a choice.
+6. Reach a clear outcome showing crew safety, sample recovery status, final resilience, and the mission’s safety lesson.
+7. Replay the mission with all mission state reset.
